@@ -31,12 +31,23 @@ app.get("/user", async (req, res) => {
 });
 
 app.delete("/user", async (req, res) => {
-    const id = req.body?.id;
+    const userId = req.body?.userId;
     try {
-        await User.findByIdAndDelete(id);
+        await User.findByIdAndDelete(userId);
         res.send("User deleted successfully.");
     } catch (err) {
         res.status(400).send("Unable to delete user.");
+    }
+});
+
+app.patch("/user", async (req, res) => {
+    const userId = req.body?._id;
+    const data = req.body;
+    try {
+        await User.findByIdAndUpdate({ _id: userId }, data);
+        res.send("User updated successfully.");
+    } catch (err) {
+        res.status(400).send("Unable to update user.");
     }
 });
 
