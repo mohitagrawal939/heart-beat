@@ -51,6 +51,17 @@ app.patch("/user", async (req, res) => {
     }
 });
 
+app.patch("/userByEmail", async (req, res) => {
+    const userEmail = req.body?.email;
+    const data = req.body;
+    try {
+        await User.findOneAndUpdate({ email: userEmail }, data);
+        res.send("User updated successfully.");
+    } catch (err) {
+        res.status(400).send("Unable to update user.");
+    }
+});
+
 app.get("/feed", async (req, res) => {
     try {
         const result = await User.find({});
