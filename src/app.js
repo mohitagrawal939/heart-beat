@@ -9,10 +9,10 @@ app.use(express.json());
 app.post("/signup", async (req, res) => {
     const user = new User(req.body);
     try {
-        await user.save();
+        await user.save({ isNew: true });
         res.send("User added successfully.");
     } catch (err) {
-        res.status(400).send("Unable to add users.");
+        res.status(400).send("Unable to add users." + err.message);
     }
 });
 
@@ -43,19 +43,8 @@ app.delete("/user", async (req, res) => {
 app.patch("/user/:userId", async (req, res) => {
     const userId = req.params?.userId;
     const data = req.body;
-
-    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
-
-    const isUpdateAllowed = Object.keys(data).every((k) =>
-        ALLOWED_UPDATES.includes(k)
-    );
-
-    if (!isUpdateAllowed) {
-        res.status(400).send("Update not allowed.");
-    }
     try {
         const ALLOWED_UPDATES = [
-            "userId",
             "photoUrl",
             "about",
             "gender",
