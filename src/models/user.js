@@ -5,6 +5,8 @@ const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
         required: true,
+        minLength: 2,
+        maxLength: 50,
     },
     lastName: {
         type: String,
@@ -12,13 +14,28 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
     },
     password: {
         type: String,
         required: true,
     },
-    age: Number,
+    age: {
+        type: Number,
+        min: 18,
+    },
     gender: String,
+    photoUrl: {
+        type: String,
+        default: "https://dummyimage.com",
+    },
+    skills: [String],
+    about: {
+        type: String,
+        default: "This is default about description",
+    },
 });
 
 module.exports = mongoose.model("User", userSchema);
