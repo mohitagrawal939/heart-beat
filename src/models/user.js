@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 // both below type is valid way to define schema with it's types
 const userSchema = new mongoose.Schema(
@@ -18,6 +19,11 @@ const userSchema = new mongoose.Schema(
             unique: true,
             lowercase: true,
             trim: true,
+            validate(value) {
+                if (!validator.isEmail(value)) {
+                    throw new Error("Invalid email address.");
+                }
+            },
         },
         password: {
             type: String,
@@ -31,13 +37,18 @@ const userSchema = new mongoose.Schema(
             type: String,
             validate(value) {
                 if (!["male", "female", "others"].includes(value)) {
-                    throw Error("Geneder is not validate.");
+                    throw Error("Gender is not validate.");
                 }
             },
         },
         photoUrl: {
             type: String,
             default: "https://dummyimage.com",
+            validate(value) {
+                if (!validator.isURL(value)) {
+                    throw new Error("Invalid photo URL.");
+                }
+            },
         },
         skills: [String],
         about: {
