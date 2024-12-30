@@ -1,5 +1,7 @@
+const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
 
 // both below type is valid way to define schema with it's types
 const userSchema = new mongoose.Schema(
