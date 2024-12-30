@@ -6,6 +6,7 @@ const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 
 const app = express();
 
@@ -45,9 +46,14 @@ app.post("/login", async (req, res) => {
         if (isPasswordValid) {
             const token = await jwt.sign(
                 { _id: user._id },
-                process.env.SECRET_KEY
+                process.env.SECRET_KEY,
+                {
+                    expiresIn: "7d",
+                }
             );
-            res.cookie("token", token);
+            res.cookie("token", token, {
+                expires: new Date(Date.now() + 8 * 3600000),
+            });
             res.send("Login Successful.");
         } else {
             throw new Error("Invalid credentials.");
@@ -57,20 +63,9 @@ app.post("/login", async (req, res) => {
     }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
     try {
-        const cookies = req.cookies;
-        const { token } = cookies;
-        if (!token) {
-            throw new Error("Invalid token.");
-        }
-        const decodedMessage = await jwt.verify(token, process.env.SECRET_KEY);
-        const { _id } = decodedMessage;
-
-        const user = await User.findById(_id);
-        if (!user) {
-            throw new Error("User does not exist.");
-        }
+        const user = req.user;
         res.send(user);
     } catch (err) {
         res.status(400).send("Error : " + err.message);
