@@ -2,17 +2,21 @@ const express = require("express");
 require("dotenv").config();
 const { connectDB } = require("./config/database");
 const User = require("./models/user");
+const { validateSignUpData } = require("./utils/validation");
 
 const app = express();
 
 app.use(express.json());
+
 app.post("/signup", async (req, res) => {
     const user = new User(req.body);
+
     try {
+        validateSignUpData(req);
         await user.save({ isNew: true });
         res.send("User added successfully.");
     } catch (err) {
-        res.status(400).send("Unable to add users." + err.message);
+        res.status(400).send("Error : " + err.message);
     }
 });
 
