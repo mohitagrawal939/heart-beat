@@ -26,7 +26,14 @@ const userSchema = new mongoose.Schema({
         type: Number,
         min: 18,
     },
-    gender: String,
+    gender: {
+        type: String,
+        validate(value) {
+            if (!["male", "female", "others"].includes(value)) {
+                throw Error("Geneder is not validate.");
+            }
+        },
+    },
     photoUrl: {
         type: String,
         default: "https://dummyimage.com",
