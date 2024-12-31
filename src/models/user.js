@@ -37,15 +37,19 @@ const userSchema = new mongoose.Schema(
         },
         gender: {
             type: String,
-            validate(value) {
-                if (!["male", "female", "others"].includes(value)) {
-                    throw Error("Gender is not validate.");
-                }
+            enum: {
+                values: ["male", "female", "others"],
+                message: `{VALUE} is not valid gender.`,
             },
+            // validate(value) {
+            //     if (!["male", "female", "others"].includes(value)) {
+            //         throw Error("Gender is not validate.");
+            //     }
+            // },
         },
         photoUrl: {
             type: String,
-            default: "https://dummyimage.com",
+            default: "https://mohitagrawal.xyz/assets/author.png",
             validate(value) {
                 if (!validator.isURL(value)) {
                     throw new Error("Invalid photo URL.");
