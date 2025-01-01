@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const sendResponse = require("../utils/responseSender");
 
 const userAuth = async (req, res, next) => {
     try {
@@ -16,7 +17,7 @@ const userAuth = async (req, res, next) => {
         req.user = user;
         next();
     } catch (err) {
-        res.status(400).send("ERROR: " + err.message);
+        sendResponse(res, 400, null, "ERROR" + err.message);
     }
 };
 
