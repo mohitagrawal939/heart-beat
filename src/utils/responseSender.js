@@ -7,7 +7,7 @@ const sendResponse = (res, statusCode, data = null, message = "") => {
             (statusCode >= 200 && statusCode < 300
                 ? "Request was successful"
                 : "An error occurred"),
-        data,
+        data: data ? data : undefined,
     };
 
     res.status(statusCode).json(response);
