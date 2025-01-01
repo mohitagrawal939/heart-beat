@@ -3,7 +3,7 @@ const { userAuth } = require("../middlewares/auth");
 const userRouter = express.Router();
 const User = require("../models/user");
 const ConnectionRequest = require("../models/connectionRequest");
-const user = require("../models/user");
+const sendResponse = require("../utils/responseSender");
 
 const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
 
@@ -14,12 +14,14 @@ userRouter.get("/user/requests/recieved", userAuth, async (req, res) => {
             toUserId: loggedInUser._id,
             status: "interested",
         }).populate("fromUserId", USER_SAFE_DATA);
-        res.json({
-            message: "Connection requests fetched successfully",
-            data: connectionRequests,
-        });
+        sendResponse(
+            res,
+            200,
+            connectionRequests,
+            "Connection requests fetched successfully"
+        );
     } catch (err) {
-        res.status(400).send("Error : " + err);
+        sendResponse(res, 400, null, "Error : " + err);
     }
 });
 
@@ -45,12 +47,9 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
             return connectionRequest.fromUserId;
         });
 
-        res.json({
-            message: "Connections fetched successfully",
-            data,
-        });
+        sendResponse(res, 200, data, "Connections fetched successfully");
     } catch (err) {
-        res.status(400).send("Error : " + err);
+        sendResponse(res, 400, null, "Error : " + err);
     }
 });
 
@@ -83,11 +82,10 @@ userRouter.get("/feed", userAuth, async (req, res) => {
             .select(USER_SAFE_DATA)
             .limit(limit)
             .skip(skip);
-        res.json({
-            data: users,
-        });
+
+        sendResponse(res, 200, users, "Feed fetched successfully");
     } catch (err) {
-        res.status(400).send("Error : " + err);
+        sendResponse(res, 400, null, "Error : " + err);
     }
 });
 
