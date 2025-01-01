@@ -2,6 +2,7 @@ const express = require("express");
 const { validateSignUpData } = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
+const sendResponse = require("../utils/responseSender");
 
 const authRouter = express.Router();
 
@@ -23,9 +24,9 @@ authRouter.post("/signup", async (req, res) => {
         res.cookie("token", token, {
             expires: new Date(Date.now() + 8 * 3600000),
         });
-        res.json({ message: "User added successfully.", data: savedUser });
+        sendResponse(res, 201, savedUser, "User added successfully.");
     } catch (err) {
-        res.status(400).send("Error : " + err.message);
+        sendResponse(res, 400, null, "Error : " + err.message);
     }
 });
 
@@ -45,12 +46,12 @@ authRouter.post("/login", async (req, res) => {
             res.cookie("token", token, {
                 expires: new Date(Date.now() + 8 * 3600000),
             });
-            res.send(user);
+            sendResponse(res, 200, user, "Login successful.");
         } else {
             throw new Error("Invalid credentials.");
         }
     } catch (err) {
-        res.status(400).send("Error : " + err.message);
+        sendResponse(res, 400, null, "Error : " + err.message);
     }
 });
 
@@ -59,7 +60,7 @@ authRouter.post("/logout", async (req, res) => {
     res.cookie("token", "", {
         expires: new Date(Date.now()),
     });
-    res.send("Logout Successful.");
+    sendResponse(res, 200, null, "Logout successful.");
 });
 
 module.exports = authRouter;
