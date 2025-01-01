@@ -1,15 +1,16 @@
 const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const { validateEditProfileData } = require("../utils/validation");
+const sendResponse = require("../utils/responseSender");
 
 const profileRouter = express.Router();
 
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
     try {
         const user = req.user;
-        res.send(user);
+        sendResponse(res, 200, user);
     } catch (err) {
-        res.status(400).send("Error : " + err.message);
+        sendResponse(res, 400, null, "Error : " + err.message);
     }
 });
 
@@ -25,12 +26,14 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
             loggedInUser[key] = req.body[key];
         });
 
-        res.json({
-            message: `${loggedInUser.firstName} Profile updated successfully`,
-            user: loggedInUser,
-        });
+        sendResponse(
+            res,
+            200,
+            loggedInUser,
+            `${loggedInUser.firstName} Profile updated successfully`
+        );
     } catch (err) {
-        res.status(400).send("ERROR : " + err.message);
+        sendResponse(res, 400, null, "Error : " + err.message);
     }
 });
 
