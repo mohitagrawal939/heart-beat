@@ -2,6 +2,7 @@ const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
+const sendResponse = require("../utils/sendResponse");
 const requestRouter = express.Router();
 
 requestRouter.post(
@@ -15,12 +16,12 @@ requestRouter.post(
 
             const allowedStatus = ["ignored", "interested"];
             if (!allowedStatus.includes(status)) {
-                return res.status(400).json({ message: "Invalid status" });
+                sendResponse(res, 400, null, "Invalid status");
             }
 
             const toUser = await User.findById(toUserId);
             if (!toUser) {
-                return res.status(400).json({ message: "User not found" });
+                return sendResponse(res, 400, null, "User not found");
             }
             const existingRequest = await ConnectionRequest.findOne({
                 $or: [
@@ -29,9 +30,12 @@ requestRouter.post(
                 ],
             });
             if (existingRequest) {
-                return res
-                    .status(400)
-                    .json({ message: "Connection request already sent" });
+                return sendResponse(
+                    res,
+                    400,
+                    null,
+                    "Connection request already sent"
+                );
             }
 
             const connectRequest = new ConnectionRequest({
@@ -40,12 +44,14 @@ requestRouter.post(
                 status,
             });
             const data = await connectRequest.save();
-            res.json({
-                message: `${req.user.firstName} sent connection request to ${toUser.firstName} ans status is ${status}`,
+            sendResponse(
+                res,
+                200,
                 data,
-            });
+                `${req.user.firstName} sent connection request to ${toUser.firstName} and status is ${status}`
+            );
         } catch (err) {
-            res.status(400).send("Error : " + err.message);
+            sendResponse(res, 400, null, "Error : " + err.message);
         }
     }
 );
@@ -59,7 +65,7 @@ requestRouter.post(
             const { status, requestId } = req.params;
             const allowedStatus = ["accepted", "rejected"];
             if (!allowedStatus.includes(status)) {
-                return res.status(400).json({ message: "Invalid status" });
+                return sendResponse(res, 400, null, "Invalid status");
             }
 
             const connectionRequest = await ConnectionRequest.find({
@@ -68,16 +74,16 @@ requestRouter.post(
                 status: "interested",
             });
             if (!connectionRequest) {
-                return res.status(400).json({ message: "Request not found" });
+                return sendResponse(res, 400, null, "Request not found");
             }
 
             connectionRequest.status = status;
 
             const data = await connectionRequest.save();
 
-            res.json({ data, message: `Connection request ${status}` });
+            sendResponse(res, 200, data, `Connection request ${status}`);
         } catch (err) {
-            res.status(400).send("Error : " + err.message);
+            sendResponse(res, 400, null, "Error : " + err.message);
         }
     }
 );
